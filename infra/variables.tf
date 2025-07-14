@@ -10,3 +10,8 @@ variable "sg_access_ip" {
   type = string
   default = "0.0.0.0/0"
 }
+
+variable "app_port" {
+    
+  
+}
