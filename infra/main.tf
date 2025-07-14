@@ -9,3 +9,8 @@ module "networking" {
   access_ip        = var.sg_access_ip
   security_groups  = local.security_groups
 }
+
+module "eks" {
+  source = "./eks"
+  subnet_ids = module.networking.private_subnets
+}
