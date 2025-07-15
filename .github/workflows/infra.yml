@@ -122,7 +122,7 @@ jobs:
         KUBE_CONFIG_DATA: ${{ env.KUBE_CONFIG_DATA }}
       with:
         command: |
-          echo ${{ env.KUBE_CONFIG_DATA }}
+          echo $KUBE_CONFIG_DATA
           kubectl apply -k "https://github.com/ argoproj/argo-cd/manifests/crds?ref=v2.4.9"
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
