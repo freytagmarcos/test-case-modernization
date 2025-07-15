@@ -108,23 +108,17 @@ jobs:
         terraform apply -auto-approve -input=false
       working-directory: ./infra
 
-    - name: Terraform Output
+    - name: Generate Kubeconfig
       run: |
-        terraform output -json kubeconfig > kubeconfig
+        aws eks update-kubeconfig --name eks-sre1 --region us-east-1 --kubeconfig kubeconfig
         cat kubeconfig
-        EOF=$(uuidgen)
-        echo 'KUBE_CONFIG_DATA<<$EOF' >> $GITHUB_ENV
-        echo $(cat ./kubeconfig | base64) >> $GITHUB_ENV
-        echo '$EOF' >> $GITHUB_ENV
-        echo "$KUBE_CONFIG_DATA"
       working-directory: ./infra
     - name: Install argo
       uses: koslib/helm-eks-action@master
       with:
         command: |
-          echo "$KUBE_CONFIG_DATA"
-          kubectl apply -k "https://github.com/ argoproj/argo-cd/manifests/crds?ref=v2.4.9" --kubeconfig ./infra/kubeconfig
-          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+          kubectl apply -k "https://github.com/argoproj/argo-cd/manifests/crds?ref=v2.4.9" --kubeconfig ./infra/kubeconfig
+          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --kubeconfig ./infra/kubeconfig
 
     - name: Install datadog
       uses: koslib/helm-eks-action@master
