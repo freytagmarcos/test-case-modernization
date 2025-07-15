@@ -142,6 +142,13 @@ jobs:
                   keyName: "api-key"
           EOF
 
+    - name: Install OpenTelemetry
+      uses: koslib/helm-eks-action@master
+      with:
+        command: |
+          helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+          helm install otel-operator open-telemetry/opentelemetry-operator -n opentelemetry -f ./helm-charts/otel/values.yaml --kubeconfig ./infra/kubeconfig
+
     - name: Terraform Destroy
       if: ${{ github.event.inputs.terraform_destroy  == 'true' }}
       run: |
