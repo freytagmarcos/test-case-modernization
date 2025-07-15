@@ -114,7 +114,7 @@ jobs:
         cat kubeconfig
         EOF=$(uuidgen)
         echo 'KUBE_CONFIG_DATA<<$EOF' >> $GITHUB_ENV
-        echo $(cat ./kubeconfig) >> $GITHUB_ENV
+        echo $(cat ./kubeconfig | base64) >> $GITHUB_ENV
         echo '$EOF' >> $GITHUB_ENV   
       working-directory: ./infra
     - name: Install argo
