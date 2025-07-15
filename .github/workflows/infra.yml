@@ -127,7 +127,7 @@ jobs:
         command: |
           helm repo add datadog https://helm.datadoghq.com
           helm install datadog-operator datadog/datadog-operator --kubeconfig ./infra/kubeconfig
-          kubectl create secret generic datadog-secret --from-literal api-key=ef159d812453f08f1c839b832ab6531d --kubeconfig ./infra/kubeconfig
+          kubectl create secret generic datadog-secret --from-literal api-key=${{ secrets.DATADOG_API_KEY }} --kubeconfig ./infra/kubeconfig
           cat <<EOF | kubectl apply --kubeconfig ./infra/kubeconfig -f -
           kind: "DatadogAgent"
           apiVersion: "datadoghq.com/v2alpha1"
@@ -144,6 +144,8 @@ jobs:
 
     - name: Terraform Destroy
       if: ${{ github.event.inputs.terraform_destroy  == 'true' }}
-      run: terraform destroy -auto-approve -input=false -var 
+      run: |
+        export TF_VAR_agent_ip="$(curl ifconfig.me; echo)/32" 
+        terraform destroy -auto-approve -input=false
       working-directory: ./infra      
     

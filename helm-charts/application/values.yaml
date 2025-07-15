@@ -1,6 +1,6 @@
-replicas:
+replicas: 1
 
 image:
   repository:
   tag:
-  pullPolicy:
+  pullPolicy: IfNotPresent
