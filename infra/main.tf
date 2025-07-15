@@ -1,7 +1,7 @@
 module "networking" {
-  source = "./networking"
+  source           = "./networking"
   vpc_cidr         = "10.123.0.0/16"
-  private_sn_count = 2
+  private_sn_count = 3
   public_sn_count  = 2
   max_subnets      = 20
   public_cidrs     = [for i in range(2, 255, 2) : cidrsubnet("10.123.0.0/16", 8, i)]
@@ -11,6 +11,10 @@ module "networking" {
 }
 
 module "eks" {
-  source = "./eks"
-  subnet_ids = module.networking.private_subnets
+  source       = "./eks"
+  cluster_name = "eks-sre"
+  subnet_ids   = module.networking.private_subnets
+  access_cidr  = [var.sg_access_ip]
+  policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = "arn:aws:iam::114368227931:group/admin"
 }

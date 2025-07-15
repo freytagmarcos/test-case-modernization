@@ -1,6 +1,8 @@
 # ----vpc/main.tf -----
 
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+  exclude_names = ["us-east-1e"]
+}
 
 resource "random_shuffle" "az_list" {
   input        = data.aws_availability_zones.available.names

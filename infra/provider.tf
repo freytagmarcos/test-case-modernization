@@ -3,10 +3,11 @@ terraform {
     aws = {
       source = "hashicorp/aws"
     }
-    mongodbatlas = {
-      source = "mongodb/mongodbatlas"
-      version = "1.17.2"
-    }
+
+    # helm = {
+    #   source = "hashicorp/helm"
+    #   version = "3.0.2"
+    # }
   }
 }
 
@@ -14,5 +15,8 @@ provider "aws" {
   region = var.aws_region
 }
 
-provider "mongodbatlas" {
-}
+# provider "helm" {
+#   kubernetes {
+#     config_path = ""
+#   }
+# }

@@ -6,13 +6,6 @@ resource "aws_eks_cluster" "cluster_eks" {
   access_config {
     authentication_mode = "API"
   }
-  
-  encryption_config {
-    provider {
-      key_arn = var.kms_arn
-    }
-    resources = "secrets"
-  }
 
   vpc_config {
     endpoint_public_access = true
@@ -50,8 +43,9 @@ resource "aws_eks_node_group" "eks_node_group" {
   cluster_name = aws_eks_cluster.cluster_eks.name
   subnet_ids = var.subnet_ids
   node_role_arn = aws_iam_role.eks_node_group_role.arn
-  capacity_type = ""
-  instance_types = [ "t4.medium" ]
+  capacity_type = "SPOT"
+  instance_types = [ "t4g.medium" ]
+  ami_type = "AL2023_ARM_64_STANDARD"
   scaling_config {
     desired_size = 1
     max_size = 2
@@ -90,4 +84,21 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKS_CNI_Policy" {
 resource "aws_iam_role_policy_attachment" "example-AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role       = aws_iam_role.eks_node_group_role.name
+}
+
+resource "aws_eks_access_entry" "eks_access" {
+  cluster_name = aws_eks_cluster.cluster_eks.name
+  principal_arn = var.principal_arn
+  kubernetes_groups = ["admin"]
+  type = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "eks_access_entry" {
+  cluster_name = aws_eks_cluster.cluster_eks.name
+  policy_arn = var.policy_arn
+  principal_arn = var.principal_arn
+  access_scope {
+    type = "cluster"
+  }
+  
 }

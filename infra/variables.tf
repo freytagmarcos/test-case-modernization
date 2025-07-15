@@ -7,11 +7,11 @@ variable "aws_account" {
 }
 
 variable "sg_access_ip" {
-  type = string
-  default = "0.0.0.0/0"
+  type    = string
+  default = "200.192.99.36/32"
 }
 
 variable "app_port" {
-    
-  
+  default = 443
+
 }

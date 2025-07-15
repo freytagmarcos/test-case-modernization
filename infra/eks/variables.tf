@@ -7,10 +7,14 @@ variable "subnet_ids" {
   type = list(any)
 }
 
-variable "kms_arn" {
+variable "access_cidr" {
+  type = list(string)
+}
+
+variable "policy_arn" {
   type = string
 }
 
-variable "access_cidr" {
-  type = list(string)
+variable "principal_arn" {
+  type = string
 }
