@@ -1,0 +1,32 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  mongodb_2:
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    restart: always
+    container_name: mongodb_2
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+
+  api_users:
+    build:
+      context: .
+    ports: 
+      - 5000:5000
+    restart: always
+    depends_on:
+     - mongodb_2
+    environment:
+      FLASK_ENV: HML
+      MONGODB_DB: users
+      MONGODB_HOST: mongodb_2
+      MONGODB_USERNAME: admin
+      MONGODB_PASSWORD: admin
+      JWT_SECRET_KEY: t1NP63m4wnBg6nyHYKfmc2TpCOGI4nss
+    volumes:
+      - .:/app

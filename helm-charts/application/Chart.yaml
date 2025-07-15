@@ -1,0 +1,8 @@
+apiVersion: v2
+name: user-app
+version: 1.0.0
+appVersion: 1.0.0
+description: Simple user api
+maintainers:
+  - name: Marcos Henrique Freytag Welter
+    email: marcosfreytag@gmail.com
