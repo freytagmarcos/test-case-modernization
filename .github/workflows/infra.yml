@@ -112,14 +112,13 @@ jobs:
       run: |
         terraform output -raw kubeconfig > kubeconfig
         cat kubeconfig
-        echo 'KUBE_CONFIG_DATA<<EOF' >> $GITHUB_ENV
-        echo $(cat ./kubeconfig | base64) >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV   
+        EOF=$(uuidgen)
+        echo 'KUBE_CONFIG_DATA<<$EOF' >> $GITHUB_ENV
+        echo $(cat ./kubeconfig) >> $GITHUB_ENV
+        echo '$EOF' >> $GITHUB_ENV   
       working-directory: ./infra
     - name: Install argo
       uses: koslib/helm-eks-action@master
-      env:
-        KUBE_CONFIG_DATA: ${{ env.KUBE_CONFIG_DATA }}
       with:
         command: |
           echo $KUBE_CONFIG_DATA
