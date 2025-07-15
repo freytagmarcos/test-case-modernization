@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "user-app.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       {{- include "user-app.selectorLabels" . | nindent 6 }}
@@ -21,8 +21,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 5000
               protocol: TCP
+          envFrom:
+            configMapRef: {{ .Chart.Name }}
           livenessProbe:
             httpGet:
               path: /

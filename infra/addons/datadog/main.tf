@@ -1,4 +1,4 @@
-resource "helm_release" "datadog" {
+resource "helm_release" "datadog-operator" {
   name = datadog-operator
   namespace = datadog
   repository = datadog

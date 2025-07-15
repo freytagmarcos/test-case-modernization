@@ -15,3 +15,8 @@ variable "app_port" {
   default = 443
 
 }
+
+variable "cluster_name" {
+  type = string
+  default = "eks-sre1"
+}

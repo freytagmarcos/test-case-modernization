@@ -15,7 +15,7 @@ resource "aws_vpc" "vpc" {
    enable_dns_support = true
 
    tags = {
-      Name = "aws_vpc"
+      Name = "aws_vpc_new"
    }
 }
 
@@ -57,7 +57,7 @@ resource "aws_eip" "eip" {
   depends_on = [ aws_internet_gateway.igw ]
 }
 resource "aws_nat_gateway" "natgw" {
-  subnet_id = aws_subnet.private_subnet[1].id
+  subnet_id = aws_subnet.public_subnet[1].id
   allocation_id = aws_eip.eip.id
   connectivity_type = "public"
   tags = {
