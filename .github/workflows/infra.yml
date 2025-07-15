@@ -147,8 +147,8 @@ jobs:
       with:
         command: |
           helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
-          helm install otel-operator open-telemetry/opentelemetry-operator -n opentelemetry -f ./helm-charts/otel/values.yaml --kubeconfig ./infra/kubeconfig
-
+          helm install otel-operator open-telemetry/opentelemetry-operator -n opentelemetry  --kubeconfig ./infra/kubeconfig
+          kubectl apply -f ./helm-charts/otel/otel-sidecar.yaml -n opentelemetry
     - name: Terraform Destroy
       if: ${{ github.event.inputs.terraform_destroy  == 'true' }}
       run: |
