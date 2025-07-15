@@ -112,9 +112,9 @@ jobs:
       run: |
         terraform output -raw kubeconfig > kubeconfig
         cat kubeconfig
-        echo 'KUBE_CONFIG_DATA<<KUBECONFIG' >> $GITHUB_ENV
+        echo 'KUBE_CONFIG_DATA<<EOF' >> $GITHUB_ENV
         echo $(cat ./kubeconfig | base64) >> $GITHUB_ENV
-        echo 'KUBECONFIG' >> $GITHUB_ENV   
+        echo 'EOF' >> $GITHUB_ENV   
       working-directory: ./infra
     - name: Install argo
       uses: koslib/helm-eks-action@master
@@ -122,6 +122,7 @@ jobs:
         KUBE_CONFIG_DATA: ${{ env.KUBE_CONFIG_DATA }}
       with:
         command: |
+          echo ${{ env.KUBE_CONFIG_DATA }}
           kubectl apply -k "https://github.com/ argoproj/argo-cd/manifests/crds?ref=v2.4.9"
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
