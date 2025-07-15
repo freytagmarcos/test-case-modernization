@@ -8,6 +8,7 @@ resource "aws_eks_cluster" "cluster_eks" {
   }
 
   vpc_config {
+    endpoint_private_access = true
     endpoint_public_access = true
     subnet_ids = var.subnet_ids
     public_access_cidrs = var.access_cidr
@@ -46,6 +47,7 @@ resource "aws_eks_node_group" "eks_node_group" {
   capacity_type = "SPOT"
   instance_types = [ "t4g.medium" ]
   ami_type = "AL2023_ARM_64_STANDARD"
+
   scaling_config {
     desired_size = 1
     max_size = 2
@@ -55,6 +57,12 @@ resource "aws_eks_node_group" "eks_node_group" {
   update_config {
     max_unavailable = 1
   }
+
+  depends_on = [ 
+    aws_iam_role_policy_attachment.example-AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.example-AmazonEKS_CNI_Policy,
+    aws_iam_role_policy_attachment.example-AmazonEKSWorkerNodePolicy
+   ]
 }
 
 resource "aws_iam_role" "eks_node_group_role" {
@@ -87,16 +95,18 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEC2ContainerRegistryRea
 }
 
 resource "aws_eks_access_entry" "eks_access" {
+  for_each = toset(var.principal_arn)
   cluster_name = aws_eks_cluster.cluster_eks.name
-  principal_arn = var.principal_arn
+  principal_arn = each.value
   kubernetes_groups = ["admin"]
   type = "STANDARD"
 }
 
 resource "aws_eks_access_policy_association" "eks_access_entry" {
+  for_each = toset(var.principal_arn)
   cluster_name = aws_eks_cluster.cluster_eks.name
   policy_arn = var.policy_arn
-  principal_arn = var.principal_arn
+  principal_arn = each.value
   access_scope {
     type = "cluster"
   }

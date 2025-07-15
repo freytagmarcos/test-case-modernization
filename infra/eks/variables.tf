@@ -16,5 +16,5 @@ variable "policy_arn" {
 }
 
 variable "principal_arn" {
-  type = string
+  type = list(string)
 }

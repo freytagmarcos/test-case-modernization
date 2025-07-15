@@ -51,6 +51,21 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+resource "aws_eip" "eip" {
+  domain = "vpc"
+
+  depends_on = [ aws_internet_gateway.igw ]
+}
+resource "aws_nat_gateway" "natgw" {
+  subnet_id = aws_subnet.private_subnet[1].id
+  allocation_id = aws_eip.eip.id
+  connectivity_type = "public"
+  tags = {
+    name = "natgw"
+  }
+  depends_on = [ aws_internet_gateway.igw ]
+}
+
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.vpc.id
   tags = {
@@ -58,16 +73,33 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.vpc.id
+  tags = {
+    Name = "private_rt"
+  }
+}
 resource "aws_route" "default_route" {
   route_table_id         = aws_route_table.public_rt.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.igw.id
 }
 
+resource "aws_route" "nat_route" {
+  route_table_id = aws_route_table.private_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_nat_gateway.natgw.id  
+}
 resource "aws_route_table_association" "rt_association" {
   count          = var.public_sn_count
   subnet_id      = aws_subnet.public_subnet.*.id[count.index]
   route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_route_table_association" "rt_private_association" {
+  count          = var.private_sn_count
+  subnet_id      = aws_subnet.private_subnet.*.id[count.index]
+  route_table_id = aws_route_table.private_rt.id
 }
 
 resource "aws_default_route_table" "private_rt" {
