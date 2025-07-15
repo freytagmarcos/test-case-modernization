@@ -103,18 +103,21 @@ jobs:
       # On push to "main", build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
+      if: ${{ github.event.inputs.terraform_destroy  == 'false' }}
       run: |
         export TF_VAR_agent_ip="$(curl ifconfig.me; echo)/32"
         terraform apply -auto-approve -input=false
       working-directory: ./infra
 
     - name: Generate Kubeconfig
+      if: ${{ github.event.inputs.terraform_destroy  == 'false' }}
       run: |
         aws eks update-kubeconfig --name eks-sre1 --region us-east-1 --kubeconfig kubeconfig
         cat kubeconfig
       working-directory: ./infra
     - name: Install argo
       uses: koslib/helm-eks-action@master
+      if: ${{ github.event.inputs.terraform_destroy  == 'false' }}
       with:
         command: |
           kubectl create ns argocd --kubeconfig ./infra/kubeconfig
@@ -123,6 +126,7 @@ jobs:
 
     - name: Install datadog
       uses: koslib/helm-eks-action@master
+      if: ${{ github.event.inputs.terraform_destroy  == 'false' }}
       with:
         command: |
           helm repo add datadog https://helm.datadoghq.com
@@ -144,11 +148,14 @@ jobs:
 
     - name: Install OpenTelemetry
       uses: koslib/helm-eks-action@master
+      
+      if: ${{ github.event.inputs.terraform_destroy  == 'false' }}
       with:
         command: |
           helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+
           helm install otel-operator open-telemetry/opentelemetry-operator -n opentelemetry  --kubeconfig ./infra/kubeconfig
-          kubectl apply -f ./helm-charts/otel/otel-sidecar.yaml -n opentelemetry
+          kubectl apply -f ./helm-charts/otel/otel-sidecar.yaml -n opentelemetry --kubeconfig ./infra/kubeconfig
     - name: Terraform Destroy
       if: ${{ github.event.inputs.terraform_destroy  == 'true' }}
       run: |
