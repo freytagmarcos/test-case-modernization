@@ -105,6 +105,46 @@ jobs:
       run: terraform apply -auto-approve -input=false
       working-directory: ./infra
 
+    - name: Terraform Output
+      run: |
+        terraform output -raw kubeconfig > kubeconfig
+        cat kubeconfig
+        echo 'KUBE_CONFIG_DATA<<KUBECONFIG' >> $GITHUB_ENV
+        echo $(cat ./kubeconfig | base64) >> $GITHUB_ENV
+        echo 'KUBECONFIG' >> $GITHUB_ENV   
+      working-directory: ./infra
+    - name: Install argo
+      uses: koslib/helm-eks-action@master
+      env:
+        KUBE_CONFIG_DATA: ${{ env.KUBE_CONFIG_DATA }}
+      with:
+        command: |
+          kubectl apply -k "https://github.com/ argoproj/argo-cd/manifests/crds?ref=v2.4.9"
+          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+    - name: Install datadog
+      uses: koslib/helm-eks-action@master
+      env:
+        KUBE_CONFIG_DATA: ${{ env.KUBE_CONFIG_DATA }}
+      with:
+        command: |
+          helm repo add datadog https://helm.datadoghq.com
+          helm install datadog-operator datadog/datadog-operator
+          kubectl create secret generic datadog-secret --from-literal api-key=ef159d812453f08f1c839b832ab6531d
+          cat <<EOF | kubectl apply -f -
+          kind: "DatadogAgent"
+          apiVersion: "datadoghq.com/v2alpha1"
+          metadata:
+            name: "datadog"
+          spec:
+            global:
+              site: "datadoghq.com"
+              credentials:
+                apiSecret:
+                  secretName: "datadog-secret"
+                  keyName: "api-key"
+          EOF
+
     - name: Terraform Destroy
       if: ${{ github.event.inputs.terraform_destroy  == 'true' }}
       run: terraform destroy -auto-approve -input=false -var 
