@@ -117,6 +117,7 @@ jobs:
       uses: koslib/helm-eks-action@master
       with:
         command: |
+          kubectl create ns argocd
           kubectl apply -k "https://github.com/argoproj/argo-cd/manifests/crds?ref=v2.4.9" --kubeconfig ./infra/kubeconfig
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --kubeconfig ./infra/kubeconfig
 
