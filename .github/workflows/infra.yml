@@ -117,20 +117,18 @@ jobs:
       uses: koslib/helm-eks-action@master
       with:
         command: |
-          kubectl create ns argocd
+          kubectl create ns argocd --kubeconfig ./infra/kubeconfig
           kubectl apply -k "https://github.com/argoproj/argo-cd/manifests/crds?ref=v2.4.9" --kubeconfig ./infra/kubeconfig
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --kubeconfig ./infra/kubeconfig
 
     - name: Install datadog
       uses: koslib/helm-eks-action@master
-      env:
-        KUBE_CONFIG_DATA: ${{ env.KUBE_CONFIG_DATA }}
       with:
         command: |
           helm repo add datadog https://helm.datadoghq.com
-          helm install datadog-operator datadog/datadog-operator
-          kubectl create secret generic datadog-secret --from-literal api-key=ef159d812453f08f1c839b832ab6531d
-          cat <<EOF | kubectl apply -f -
+          helm install datadog-operator datadog/datadog-operator --kubeconfig ./infra/kubeconfig
+          kubectl create secret generic datadog-secret --from-literal api-key=ef159d812453f08f1c839b832ab6531d --kubeconfig ./infra/kubeconfig
+          cat <<EOF | kubectl apply --kubeconfig ./infra/kubeconfig -f -
           kind: "DatadogAgent"
           apiVersion: "datadoghq.com/v2alpha1"
           metadata:
