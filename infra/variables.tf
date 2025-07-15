@@ -20,3 +20,7 @@ variable "cluster_name" {
   type = string
   default = "eks-sre1"
 }
+
+variable "agent_ip" {
+  type = string
+}

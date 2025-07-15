@@ -14,7 +14,7 @@ module "eks" {
   source       = "./eks"
   cluster_name = var.cluster_name
   subnet_ids   = module.networking.private_subnets
-  access_cidr  = [var.sg_access_ip]
+  access_cidr  = [var.sg_access_ip, var.agent_ip]
   policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = ["arn:aws:iam::114368227931:user/usr_terraform","arn:aws:iam::114368227931:user/Marcos-Freytag"]
 }
