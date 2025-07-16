@@ -154,7 +154,7 @@ jobs:
         command: |
           helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
           ENABLE_WEBHOOKS="false"
-          helm install otel-operator open-telemetry/opentelemetry-operator --set admissionWebhooks.create=false -n opentelemetry  --kubeconfig ./infra/kubeconfig
+          helm install otel-operator open-telemetry/opentelemetry-operator --set admissionWebhooks.create=false -n opentelemetry --create-namespace --kubeconfig ./infra/kubeconfig
           kubectl apply -f ./helm-charts/otel/otel-sidecar.yaml -n opentelemetry --kubeconfig ./infra/kubeconfig
     - name: Terraform Destroy
       if: ${{ github.event.inputs.terraform_destroy  == 'true' }}
