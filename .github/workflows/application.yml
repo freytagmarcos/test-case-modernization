@@ -63,7 +63,7 @@ jobs:
       uses: koslib/helm-eks-action@master
       with:
         command: |
-          cat <<EOF | kubectl apply --kubeconfig ./kubeconfig -f -
+          cat <<EOF | kubectl apply --kubeconfig kubeconfig -f -
             apiVersion: argoproj.io/v1alpha1
             kind: Application
             metadata:
