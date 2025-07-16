@@ -28,6 +28,12 @@ jobs:
       if: ${{ github.event.inputs.skip_docker  == 'false' }}
       uses: docker/setup-buildx-action@v3
     
+    - name: Configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
     - name: Build Docker
       if: ${{ github.event.inputs.skip_docker  == 'false' }}
       uses: docker/build-push-action@v6
@@ -49,11 +55,15 @@ jobs:
         region: us-east-1
         image: rest-api-flask:${{ github.event.inputs.app_version }}
 
+    - name: Generate Kubeconfig
+      run: |
+        aws eks update-kubeconfig --name eks-sre1 --region us-east-1 --kubeconfig kubeconfig
+        cat kubeconfig
     - name: Apply Argo Application
       uses: koslib/helm-eks-action@master
       with:
         command: |
-          cat <<EOF | kubectl apply --kubeconfig ./infra/kubeconfig -f -
+          cat <<EOF | kubectl apply --kubeconfig ./kubeconfig -f -
             apiVersion: argoproj.io/v1alpha1
             kind: Application
             metadata:
@@ -70,7 +80,7 @@ jobs:
                     - name: image.tag
                       value: ${{ github.event.inputs.app_version }}
                 chart: user-app
-                repoURL: 
+                repoURL: https://github.com/freytagmarcos/test-case-modernization/helm-charts/application
                 targetRevision: 1.0.0
               syncPolicy:
                 retry:
