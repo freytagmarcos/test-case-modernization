@@ -2,28 +2,28 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: sidecar-otel
-  spec:
-    mode: sidecar
+spec:
+  mode: sidecar
 
-    config:
-      receivers:
-        otlp:
-          protocols:
-            grpc:
-            http:
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
 
-      processors:
-        batch:
+    processors:
+      batch:
 
-      exporters:
-        otlp:
-          endpoint: datadog-agent.datadog.svc.cluster.local:4317
-          tls:
-            insecure: true
+    exporters:
+      otlp:
+        endpoint: datadog-agent.datadog.svc.cluster.local:4317
+        tls:
+          insecure: true
 
-      service:
-        pipelines:
-          traces:
-            receivers: [otlp]
-            processors: [batch]
-            exporters: [otlp]
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlp]
