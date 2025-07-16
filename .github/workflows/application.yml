@@ -72,7 +72,7 @@ jobs:
             spec:
               destination:
                 namespace: app
-                server: 
+                server: https://kubernetes.default.svc
               project: default
               source:
                 helm:
