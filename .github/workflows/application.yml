@@ -57,13 +57,13 @@ jobs:
 
     - name: Generate Kubeconfig
       run: |
-        aws eks update-kubeconfig --name eks-sre1 --region us-east-1 --kubeconfig kubeconfig
-        cat kubeconfig
+        aws eks update-kubeconfig --name eks-sre1 --region us-east-1 --kubeconfig ./application/kubeconfig
+        cat ./application/kubeconfig
     - name: Apply Argo Application
       uses: koslib/helm-eks-action@master
       with:
         command: |
-          cat <<EOF | kubectl apply --kubeconfig kubeconfig -f -
+          cat <<EOF | kubectl apply --kubeconfig ./application/kubeconfig -f -
             apiVersion: argoproj.io/v1alpha1
             kind: Application
             metadata:
