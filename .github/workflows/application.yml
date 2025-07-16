@@ -77,6 +77,8 @@ jobs:
               source:
                 helm:
                   parameters:
+                    - name: image.repository
+                      value: 114368227931.dkr.ecr.us-east-1.amazonaws.com/rest-api-flask
                     - name: image.tag
                       value: ${{ github.event.inputs.app_version }}
                 chart: user-app
